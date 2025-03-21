@@ -13,12 +13,12 @@
         window.onload = function () {
             const iframe = document.createElement('iframe');
             iframe.id = 'myIframe';
-            iframe.src = 'http://localhost:3000/add-jobdescription';
+            iframe.src = 'https://sandbox.hirebrain.com/web/add-jobdescription';
             iframe.width = '600px';
             iframe.height = '400px';
             iframe.style.border = 'none';
 
-            const embeddedToken = '8ttYMXXoi2NZeSTd46St'; // Token from backend
+            const embeddedToken = 'A8RNswInHCrL73U52vJY'; // Token from backend
             iframe.setAttribute('data-embedded-token', embeddedToken);
 
             iframe.onload = function () {
@@ -32,7 +32,7 @@
                             domain: window.location.origin,
                             token: embeddedToken
                         },
-                        "http://localhost:3000" // React app URL
+                        "https://sandbox.hirebrain.com" // React app URL
                     );
                     console.log("Message sent with token:", embeddedToken);
                     console.log("domain: ", window.location.origin);
