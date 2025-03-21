@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded Iframe</title>
+</head>
+<body>
+
+    <h1>Iframe: Job Description</h1>
+
+    <script>
+        window.onload = function () {
+            const iframe = document.createElement('iframe');
+            iframe.id = 'myIframe';
+            iframe.src = 'http://localhost:3000/add-jobdescription';
+            iframe.width = '600px';
+            iframe.height = '400px';
+            iframe.style.border = 'none';
+
+            const embeddedToken = '8ttYMXXoi2NZeSTd46St'; // Token from backend
+            iframe.setAttribute('data-embedded-token', embeddedToken);
+
+            iframe.onload = function () {
+                sendPostMessage(); // Send postMessage when iframe loads
+            };
+
+            function sendPostMessage() {
+                setTimeout(() => {
+                    iframe.contentWindow.postMessage(
+                        {
+                            domain: window.location.origin,
+                            token: embeddedToken
+                        },
+                        "http://localhost:3000" // React app URL
+                    );
+                    console.log("Message sent with token:", embeddedToken);
+                }, 1000); // Ensures iframe is fully loaded before messaging
+            }
+
+            document.body.appendChild(iframe);
+        };
+    </script>
+
+</body>
+</html>
+
