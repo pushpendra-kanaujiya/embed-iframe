@@ -67,6 +67,8 @@
       }
 
       window.addEventListener("message", (event) => {
+        console.log("Origin: ", event.origin)
+        console.log("Iframe Origin: ", IFRAME_ORIGIN)
         if (event.origin !== IFRAME_ORIGIN) {
           console.warn("Blocked message from:", event.origin);
           return;
