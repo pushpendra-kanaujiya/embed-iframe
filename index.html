@@ -7,79 +7,77 @@
   </head>
   <body>
     <h1>Iframe: Job Description</h1>
-    <iframe
-      id="myFrame"
-      src="https://sandbox.hirebrain.com/web/add-jobdescription"
-      style="width: 600px; height: 400px; border: 1px solid #DCDCDC"
+        <iframe
+    id="myFrame"
+    src="https://sandbox.hirebrain.com/web/add-jobdescription"
+    style="width: 600px; height: 400px; border: 1px solid #DCDCDC"
     ></iframe>
 
-    <script>
-      const IFRAME_ORIGIN = "https://sandbox.hirebrain.com";
-      const PARENT_ORIGIN = window.location.origin;
-      const MAX_RETRIES = 4;
-      const embeddedToken = "A8RNswInHCrL73U52vJY"; // Token from backend
+       <script>
+    const IFRAME_ORIGIN = "https://sandbox.hirebrain.com/"; // React App URL
+    const PARENT_ORIGIN = window.location.origin;
+    const MAX_RETRIES = 4;
+    const embeddedToken = "A8RNswInHCrL73U52vJY"; // Token from backend
 
-      let retries = 0;
-      let failTimer = null;
+    let retries = 0;
+    let failTimer = null;
 
-      const iframe = document.getElementById("myFrame");
-      iframe.setAttribute("data-embedded-token", embeddedToken);
+    const iframe = document.getElementById("myFrame");
+    iframe.setAttribute("data-embedded-token", embeddedToken);
+         
 
-      function sendHandshake() {
+    function sendHandshake() {
         if (iframe.contentWindow) {
-          console.log(`Sending handshake attempt ${retries + 1}`);
-          iframe.contentWindow.postMessage(
+        iframe.contentWindow.postMessage(
             { type: "HANDSHAKE", timestamp: Date.now() },
             IFRAME_ORIGIN
-          );
+        );
         }
-      }
+    }
 
-      function sendEmbeddedToken() {
+    function sendEmbeddedToken() {
         setTimeout(() => {
-          if (iframe.contentWindow) {
+        if (iframe.contentWindow) {
             iframe.contentWindow.postMessage(
-              { domain: PARENT_ORIGIN, token: embeddedToken },
-              IFRAME_ORIGIN
+            { domain: PARENT_ORIGIN, token: embeddedToken },
+            IFRAME_ORIGIN
             );
-          }
+        }
         }, 1000); // Ensures iframe is fully loaded before messaging
-      }
+    }
 
-      function startHandshake() {
+    function startHandshake() {
         retries = 0;
         attemptHandshake();
-      }
+    }
 
-      function attemptHandshake() {
+    function attemptHandshake() {
         sendHandshake();
 
         if (failTimer) clearTimeout(failTimer); // Clear previous timer if any
 
         failTimer = setTimeout(() => {
-          if (retries < MAX_RETRIES) {
+        if (retries < MAX_RETRIES) {
             retries++;
             attemptHandshake();
-          } else {
+        } else {
             console.error("Handshake failed after", MAX_RETRIES, "retries");
-          }
+        }
         }, 3000);
-      }
+    }
 
-      window.addEventListener("message", (event) => {
-        console.log("Origin: ", event.origin)
-        console.log("Iframe Origin: ", IFRAME_ORIGIN)
+    window.addEventListener("message", (event) => {
         if (event.origin !== IFRAME_ORIGIN) {
-          console.warn("Blocked message from:", event.origin);
-          return;
+        console.warn("Blocked message from:", event.origin);
+        return;
         }
         if (event.data.type === "HANDSHAKE_ACK") {
-          clearTimeout(failTimer); // Stop retry attempts
-          sendEmbeddedToken(); // Send token after handshake is successful
+        clearTimeout(failTimer); // Stop retry attempts
+        sendEmbeddedToken(); // Send token after handshake is successful
         }
-      });
+    });
 
-      iframe.onload = startHandshake;
+    iframe.onload = startHandshake;
     </script>
   </body>
 </html>
