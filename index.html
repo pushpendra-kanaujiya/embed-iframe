@@ -7,7 +7,7 @@
   </head>
   <body>
     <h1>Iframe: Job Description</h1>
-        <iframe
+<!--         <iframe
     id="myFrame"
     src="https://sandbox.hirebrain.com/web/add-jobdescription"
     style="width: 600px; height: 400px; border: 1px solid #DCDCDC"
@@ -25,6 +25,77 @@
     const iframe = document.getElementById("myFrame");
     iframe.setAttribute("data-embedded-token", embeddedToken);
          
+
+    function sendHandshake() {
+        if (iframe.contentWindow) {
+        iframe.contentWindow.postMessage(
+            { type: "HANDSHAKE", timestamp: Date.now() },
+            IFRAME_ORIGIN
+        );
+        }
+    }
+
+    function sendEmbeddedToken() {
+        setTimeout(() => {
+        if (iframe.contentWindow) {
+            iframe.contentWindow.postMessage(
+            { domain: PARENT_ORIGIN, token: embeddedToken },
+            IFRAME_ORIGIN
+            );
+        }
+        }, 1000); // Ensures iframe is fully loaded before messaging
+    }
+
+    function startHandshake() {
+        retries = 0;
+        attemptHandshake();
+    }
+
+    function attemptHandshake() {
+        sendHandshake();
+
+        if (failTimer) clearTimeout(failTimer); // Clear previous timer if any
+
+        failTimer = setTimeout(() => {
+        if (retries < MAX_RETRIES) {
+            retries++;
+            attemptHandshake();
+        } else {
+            console.error("Handshake failed after", MAX_RETRIES, "retries");
+        }
+        }, 3000);
+    }
+
+    window.addEventListener("message", (event) => {
+        if (event.origin !== IFRAME_ORIGIN) {
+        console.warn("Blocked message from:", event.origin);
+        return;
+        }
+        if (event.data.type === "HANDSHAKE_ACK") {
+        clearTimeout(failTimer); // Stop retry attempts
+        sendEmbeddedToken(); // Send token after handshake is successful
+        }
+    });
+
+    iframe.onload = startHandshake;
+    </script> -->
+        <iframe
+    id="myFrame"
+    src="https://staging.hirebrain.com/web/add-jobdescription"
+    style="width: 600px; height: 400px; border: 1px solid #DCDCDC"
+    ></iframe>
+
+    <script>
+    const IFRAME_ORIGIN = "https://staging.hirebrain.com"; // React App URL
+    const PARENT_ORIGIN = window.location.origin;
+    const MAX_RETRIES = 4;
+    const embeddedToken = "AQIqUuCfmBSGt6H9qyOc"; // Token from backend
+
+    let retries = 0;
+    let failTimer = null;
+
+    const iframe = document.getElementById("myFrame");
+    iframe.setAttribute("data-embedded-token", embeddedToken);
 
     function sendHandshake() {
         if (iframe.contentWindow) {
